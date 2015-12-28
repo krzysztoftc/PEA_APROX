@@ -216,6 +216,8 @@ pair<int, int> SalesMan::min_of_pair(vector<pair<int, int> > table_of_pairs) {
 	int min_value = INT_MAX;
 	pair<int, int> min_pair(0, 0);
 
+//	cout<<"\nMin of pair table_of_pairs size: "<<table_of_pairs.size()<<endl;
+
 	vector<pair<int, int> >::iterator i = table_of_pairs.begin();
 
 	while (i != table_of_pairs.end()) {
@@ -233,55 +235,56 @@ pair<int, int> SalesMan::check_solve(int c, const set<int> &ts,
 		const vector<Solutions> &solves) {
 
 	vector<Solutions>::const_iterator it;
-	cout << "Solves begin size: " << solves.size();
+//	cout << "Solves begin size: " << solves.size();
 	for (it = solves.begin(); it != solves.end(); it++) {
 		Solutions s = *it;
-		cout << "\ns.last city: " << s.last_city;
+//		cout << "\ns.last city: " << s.last_city;
 
 		if (c == s.last_city && ts == s.set) {
-			cout << "\nret nie nil\n";
+//			cout << "\nret nie nil\n";
 			return s.last;
 		}
 	}
 
-	cout << "\nret nil\n";
+//	cout << "\nret nil\n";
 	return pair<int, int>(-1, -1);
 }
 
 pair<int, int> SalesMan::tsp_divide(int c, set<int> &ts,
 		vector<Solutions> &solves) {
-	cout << "tsp_divide\n";
+//	cout << "tsp_divide\n";
 
 	if (ts.find(c) != ts.end()) {
-		cout << "\nCos jest nie tak\n";
+//		cout << "\nCos jest nie tak\n";
 		exit(150);
 	}
 
 	if (!ts.empty()) {
 		vector<pair<int, int> > sub_problem;
 
-		int lc;
-		for (lc = 0; lc < ts.size(); lc++) {
+//		for (int lc = 0; lc < ts.size(); lc++) {
+		for (set<int>::iterator it = ts.begin(); it != ts.end(); it++) {
+			int lc = *it;
 			int distance = matrix.getCost(lc, c);
 			set<int> ts2;
 			ts2.insert(ts.begin(), ts.end());
 
-			cout << "\nlc: " << lc << " TS:\n";
-			for (set<int>::iterator it = ts.begin(); it != ts.end(); it++) {
-				cout << *it << " ";
-			}
+//			cout << "\nlc: " << lc << " TS:\n";
+//			for (set<int>::iterator it = ts.begin(); it != ts.end(); it++) {
+//				cout << *it << " ";
+//			}
 
-			cout << "\nTS2:\n";
-			for (set<int>::iterator it = ts2.begin(); it != ts2.end(); it++) {
-				cout << *it << " ";
-			}
+//			cout << "\nTS2:\n";
+//			for (set<int>::iterator it = ts2.begin(); it != ts2.end(); it++) {
+//				cout << *it << " ";
+//			}
 
 			ts2.erase(lc);
 
-			cout << "\nTS2 after erase:\n";
-			for (set<int>::iterator it = ts2.begin(); it != ts2.end(); it++) {
-				cout << *it << " ";
-			}
+//			cout << "\nTS2 after erase:\n";
+//			for (set<int>::iterator it = ts2.begin(); it != ts2.end(); it++) {
+//				cout << *it << " ";
+//			}
 
 			pair<int, int> solve = check_solve(c, ts, solves);
 
@@ -294,7 +297,7 @@ pair<int, int> SalesMan::tsp_divide(int c, set<int> &ts,
 							(distance + tsp_divide(lc, ts2, solves).first),
 							lc));
 		}
-
+//		cout<<"\n-------------------------------------------------";
 		pair<int, int> min = min_of_pair(sub_problem);
 
 		Solutions s;
@@ -303,8 +306,8 @@ pair<int, int> SalesMan::tsp_divide(int c, set<int> &ts,
 		s.set = ts;
 
 		solves.push_back(s);
-		static int b;
-		cout << "\nbreak b " << ++b;
+//		cout<<"Dodano\n";
+
 		return min;
 	}
 
@@ -323,12 +326,12 @@ vector<int> SalesMan::rtsp() {
 	for (int i = 1; i < matrix.size; i++) {
 		cs.insert(i);
 	}
-	cout << "Break 1\n";
-	int n = 1;
+//	cout << "Break 1\n";
+
 	while (1) {
-		cout << "Break " << (++n) << endl;
+//		cout << "Break " << (++n) << endl;
 		int lc = tsp_divide(c, cs, solves).second;
-		cout << "wyszlo z tsp_divide\n";
+//		cout << "wyszlo z tsp_divide\n";
 		if (lc == 0)
 			break;
 		best_solution.push_back(lc);
@@ -341,17 +344,22 @@ vector<int> SalesMan::rtsp() {
 
 Solution SalesMan::dynamic() {
 	vector<int> trace = rtsp();
-	cout << "done";
+//	cout << "done";
 	reverse(trace.begin(), trace.end());
 	Solution toRet;
 	toRet.trace = list<int>(trace.begin(), trace.end());
-	toRet.cost = 0;
+	toRet.trace.push_front(0);
+	toRet.trace.push_back(0);
 
-	for (vector<int>::iterator it = trace.begin() + 1; it != trace.end();
-			it++) {
-		toRet.cost += matrix.getCost(*(it - 1), *it);
+	toRet.cost = matrix.getCost(0, trace[0]);
+//	cout << "0 -> " << trace[0]<< " cost: "<<matrix.getCost(0, trace[0])<<endl;
+	for (int i = 0; i < (trace.size() - 1); i++) {
+		toRet.cost += matrix.getCost(trace[i], trace[i + 1]);
+//		cout <<trace[i] << " -> " << trace[i+1]<< " cost: "<<matrix.getCost(trace[i], trace[i + 1])<<endl;
 	}
-	toRet.cost += matrix.getCost(*(trace.end() - 1), *trace.begin());
-
+	toRet.cost += matrix.getCost(trace.back(), 0);
+//	cout << trace.back() << " -> 0" << " cost: "<<matrix.getCost(trace.back(), 0)<<endl;
+//	toRet.cost += matrix.getCost(toRet.trace.back(), toRet.trace.front());
+//	toRet.cost = 100;
 	return toRet;
 }

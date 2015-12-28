@@ -275,26 +275,28 @@ void menu() {
 
 }
 
+void test_poprawnosci_dynamic(){
+	SalesMan sales;
+	Solution s2, s;
+	uint poprawnych = 0;
+	do{
+	sales.generate(5);
+
+	cout<<"\nDynamic:\n";
+	s2 = sales.dynamic();
+	show_solution(s2);
+
+	cout<<"\nzupelny:\n";
+	s = sales.complete();
+	show_solution(s);
+	cout<<"\n-----------Poprawnych: "<<poprawnych++<<endl;
+	}while(s.cost == s2.cost);
+}
+
 int main() {
 	srand(time(0));
 
-//	menu();
-
-	SalesMan sales;
-	sales.readFile("tsp4.txt");
-
-	cout<<"\nDynamic:\n";
-	Solution s2 = sales.dynamic();
-	show_solution(s2);
-
-	cout<<"\nB&B:\n";
-	Solution s = sales.branchAndBound();
-	show_solution(s);
-
-
-
-
-
+	test_poprawnosci_dynamic();
 
 	return 0;
 }
