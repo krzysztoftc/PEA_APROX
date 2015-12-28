@@ -30,34 +30,15 @@ void test_poprawnosci() {
 
 		s = seller.complete();
 
-//		it = s.trace.begin();
-//		cout << endl << *it++;
-//		while (it != s.trace.end()) {
-//			cout << " -> " << *it++;
-//		}
-//		cout << endl << "cost: " << s.cost << endl;
 		rozwiazanie = s.cost;
 
 		s1 = seller.branchAndBound();
 		cout << "\nZ przegaldu: ";
-//		it = s.trace.begin();
-//		cout << endl << *it++;
-//		it = s.trace.begin();
-//		cout << endl << *it++;
-//		while (it != s.trace.end()) {
-//			cout << " -> " << *it++;
-//		}
+
 		cout << endl << "cost: " << s.cost << endl;
 
 		cout << "\nZ BB: ";
 
-//		it = s1.trace.begin();
-//		cout << endl << *it++;
-//		it = s1.trace.begin();
-//		cout << endl << *it++;
-//		while (it != s1.trace.end()) {
-//			cout << " -> " << *it++;
-//		}
 		cout << endl << "cost: " << s1.cost << endl;
 		cout
 				<< "===================================================================Poprawnych bylo: "
@@ -128,6 +109,41 @@ void test_wydajnosci() {
 	out.close();
 }
 
+void test_wydajnosci_ad() {
+	const int sizes_d = 14;
+	int size_d[sizes_d] =
+			{ 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30 };
+	int repeats = 100;
+	unsigned begin, end;
+
+	unsigned bb;
+	SalesMan seller;
+
+	fstream out;
+	out.open("output.txt", ios::out);
+
+	Solution s;
+
+	cout << "\nSTART dynamiczny\n";
+	for (int i = 0; i < sizes_d; i++) {
+		cout << size_d[i] << "......" << endl;
+		bb = 0;
+		out << size_d[i] << ";";
+		for (int j = 0; j < repeats; j++) {
+			cout << j << "\n";
+			seller.generate(size_d[i]);
+			begin = clock();
+			seller.branchAndBound();
+			end = clock();
+			bb += (end - begin);
+
+		}
+		out << (double) bb / (double) repeats / (double) CLOCKS_PER_SEC << endl;
+		cout << " done\n";
+	}
+	out.close();
+}
+
 void show_solution(Solution &s) {
 	list<int>::iterator it = s.trace.begin();
 	cout << endl << *it++;
@@ -145,7 +161,7 @@ void menu() {
 	while (1) {
 		printf("\033c");
 		cout << "==========================================================\n"
-				<< "=   PROJEKTOWANIE EFEKTYWNYCH ALGORYTMOW LABORATORIUM 1  =\n"
+				<< "=   PROJEKTOWANIE EFEKTYWNYCH ALGORYTMOW LABORATORIUM 2  =\n"
 				<< "=   Kinga Wilczek        210063                          =\n"
 				<< "=   Krzysztof Cabala     210047                          =\n"
 				<< "==========================================================\n\n";
@@ -153,7 +169,8 @@ void menu() {
 		case '0': {
 			cout << "MENU:\n" << "1. Wyswietl graf\n" << "2. Generuj graf\n"
 					<< "3. Wczytaj plik\n" << "4. Przeglad zupelny\n"
-					<< "5. Branch & Bound\n" << "6. Koniec\n" << ">";
+					<< "5. Branch & Bound\n" << "6. Algorytm dynamiczny\n"
+					<< "7. Koniec\n" << ">";
 
 			system("stty raw isig");
 			wybor = getchar();
@@ -194,8 +211,8 @@ void menu() {
 			seller.readFile(path);
 			cout << "\n\nWcisnij dowolny przycisk...";
 			system("stty raw isig");
-						getchar();
-						system("stty cooked");
+			getchar();
+			system("stty cooked");
 			wybor = '0';
 
 			break;
@@ -250,6 +267,30 @@ void menu() {
 		}
 
 		case '6': {
+			unsigned begin, end;
+			Solution s;
+			SalesMan tmp = seller;
+			cout << "\nCzas dzialania: \n";
+
+			begin = clock();
+			s = tmp.dynamic();
+			end = clock();
+
+			cout << (double) (end - begin) / CLOCKS_PER_SEC * 1000;
+
+			cout << " ms\nRozwiazanie:\n";
+			show_solution(s);
+			cout << "\n\nWcisnij dowolny przycisk...";
+
+			system("stty raw isig");
+			getchar();
+			system("stty cooked");
+			wybor = '0';
+
+			break;
+		}
+
+		case '7': {
 			return;
 		}
 
@@ -275,28 +316,28 @@ void menu() {
 
 }
 
-void test_poprawnosci_dynamic(){
+void test_poprawnosci_dynamic() {
 	SalesMan sales;
 	Solution s2, s;
 	uint poprawnych = 0;
-	do{
-	sales.generate(5);
+	do {
+		sales.generate(5);
 
-	cout<<"\nDynamic:\n";
-	s2 = sales.dynamic();
-	show_solution(s2);
+		cout << "\nDynamic:\n";
+		s2 = sales.dynamic();
+		show_solution(s2);
 
-	cout<<"\nzupelny:\n";
-	s = sales.complete();
-	show_solution(s);
-	cout<<"\n-----------Poprawnych: "<<poprawnych++<<endl;
-	}while(s.cost == s2.cost);
+		cout << "\nzupelny:\n";
+		s = sales.complete();
+		show_solution(s);
+		cout << "\n-----------Poprawnych: " << poprawnych++ << endl;
+	} while (s.cost == s2.cost);
 }
 
 int main() {
 	srand(time(0));
 
-	test_poprawnosci_dynamic();
+	menu();
 
 	return 0;
 }

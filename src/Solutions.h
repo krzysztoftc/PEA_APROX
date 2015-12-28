@@ -3,11 +3,10 @@
 
 #include <set>
 
-struct Solutions{
+struct Solutions {
 	int last_city;
 	std::set<int> set;
-	std::pair<int,int> last;
+	std::pair<int, int> last;
 };
-
 
 #endif /* SOLUTION_H_ */
