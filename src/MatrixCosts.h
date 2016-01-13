@@ -42,7 +42,7 @@ public:
 	std::pair<int, int> compute_edge_for_branching(
 			std::pair<int, int> max_min, std::vector<int> const &colors);
 	void generate_euclidean(unsigned vertices);
-	std::list <std::pair<int, int> >mst_prim() const;
+	std::list <std::pair<int, int> >mst_kruskal() const;
 };
 
 #endif /* MATRIXCOSTS_H_ */

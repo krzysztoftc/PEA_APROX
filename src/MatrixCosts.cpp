@@ -441,7 +441,7 @@ std::vector<std::pair<int, int> > MatrixCosts::findLasts() {
 	return toRet;
 }
 
-list <pair<int, int> > MatrixCosts::mst_prim() const {
+list <pair<int, int> > MatrixCosts::mst_kruskal() const {
 	list<pair<int, int> > tree;
 	Heap queue;
 
