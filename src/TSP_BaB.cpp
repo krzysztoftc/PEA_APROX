@@ -346,9 +346,20 @@ int main() {
 //	test_wydajnosci_ad();
 
 	MatrixCosts c;
-	c.generate_euclidean(10);
-
+	//c.generate_euclidean(10);
+    c.readFile("dane.in");
 	cout<<c.toString();
 
+	list<pair <int, int> > tree = c.mst_prim();
+
+	list<pair <int, int> >::iterator it = tree.begin();
+    int wage = 0;
+	while(tree.end()!=it){
+		cout<<"\n("<<it->first<<","<<it->second<<")";
+		wage+=c.getCost(*it);
+		it++;
+	}
+
+	cout<<"\nWage: "<<wage<<endl;
 	return 0;
 }

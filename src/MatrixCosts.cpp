@@ -16,6 +16,8 @@
 #include <list>
 #include <set>
 #include <math.h>
+#include "Heap.h"
+#include "Edge.h"
 
 using namespace std;
 
@@ -438,4 +440,76 @@ std::vector<std::pair<int, int> > MatrixCosts::findLasts() {
 
 	return toRet;
 }
+
+list <pair<int, int> > MatrixCosts::mst_prim() const {
+	list<pair<int, int> > tree;
+	Heap queue;
+
+	for (unsigned int i = 0; i < size; i++) {
+		for (unsigned int j = i; j < size; j++) {
+			if (matrix[i][j] != 0) {
+				queue.add(Edge(i, matrix[i][j], j));
+			}
+		}
+	}
+
+	bool **sets = new bool*[size];
+
+	for (unsigned int i = 0; i < size; i++) {
+		//sets[i] = NULL;
+		sets[i] = new bool[size];
+		for (unsigned int j = 0; j < size; j++) {
+			sets[i][j] = 0;
+			if (i == j)
+				sets[i][j] = 1;
+		}
+	}
+	bool *tempSet = new bool[size];
+
+	for (unsigned int i = 0; i < size; i++) {
+		tempSet[i] = 0;
+	}
+
+	for (unsigned int i = 1; i < size;) {
+		Edge min = queue.remove();
+		unsigned int begin = min.begin;
+		unsigned int wage = min.wage;
+		unsigned int end = min.end;
+
+		if (sets[begin][end] || sets[end][begin])
+			continue;
+
+		sets[begin][end] = 1;
+		sets[end][begin] = 1;
+		for (unsigned int j = 0; j < size; j++) {
+			if (sets[begin][j])
+				sets[end][j] = 1, sets[j][end] = 1;
+			if (sets[end][j])
+				sets[begin][j] = 1, sets[j][begin] = 1;
+		}
+
+		for (unsigned int k = 0; k < size; k++) {
+			if (sets[begin][k]) {
+				for (unsigned l = 0; l < size; l++) {
+					sets[k][l] = sets[begin][l];
+				}
+			}
+		}
+
+		tree.push_back(pair<int, int>(begin, end));
+
+		i++;
+
+	}
+
+	for (unsigned int i = 0; i < size; i++) {
+		delete[] sets[i];
+		sets[i] = 0;
+	}
+	delete[] sets;
+	delete[] tempSet;
+
+	return tree;
+}
+
 
