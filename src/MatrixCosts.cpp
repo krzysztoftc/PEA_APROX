@@ -13,6 +13,9 @@
 #include <stdlib.h>
 #include <limits.h>
 #include <cstring>
+#include <list>
+#include <set>
+#include <math.h>
 
 using namespace std;
 
@@ -123,6 +126,41 @@ void MatrixCosts::generate(int cities) {
 				matrix[i][j] = 1 + rand() % 50;
 //				matrix[j][i] = matrix[i][j];
 			}
+		}
+	}
+}
+
+void MatrixCosts::generate_euclidean(unsigned cities) {
+	remove();
+	size = cities;
+	create();
+
+	set<pair<int, int> > points;
+	pair<int, int> vert;
+
+	while (points.size() < cities) {
+		vert.first = rand() % 100;
+		vert.second = rand() % 100;
+		points.insert(vert);
+	}
+
+	set<pair<int, int> >::iterator it = points.begin();
+
+	vector<pair<int, int> > temp;
+	temp.insert(temp.begin(), points.begin(), points.end());
+
+	for (int i = 0; i < size; i++) {
+		for (int j = 0; j < size; j++) {
+			if (i == j) {
+				matrix[i][j] = -1;
+				continue;
+			}
+			pair<int, int> begin, end;
+			begin = temp[i];
+			end = temp[j];
+			matrix[i][j] = sqrt(
+					pow(end.first - begin.first, 2)
+							+ pow(end.second - begin.second, 2));
 		}
 	}
 }
@@ -330,7 +368,8 @@ pair<int, int> MatrixCosts::compute_edge_for_branching(pair<int, int> max_min,
 				;
 	}
 
-	if(row >= size || col >= size) return to_ret;
+	if (row >= size || col >= size)
+		return to_ret;
 	to_ret.first = row;
 	to_ret.second = col;
 

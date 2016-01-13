@@ -342,8 +342,13 @@ void test_poprawnosci_dynamic() {
 int main() {
 	srand(time(0));
 
-	menu();
+//	menu();
 //	test_wydajnosci_ad();
+
+	MatrixCosts c;
+	c.generate_euclidean(10);
+
+	cout<<c.toString();
 
 	return 0;
 }

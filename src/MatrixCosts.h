@@ -41,6 +41,7 @@ public:
 	virtual ~MatrixCosts();
 	std::pair<int, int> compute_edge_for_branching(
 			std::pair<int, int> max_min, std::vector<int> const &colors);
+	void generate_euclidean(unsigned vertices);
 };
 
 #endif /* MATRIXCOSTS_H_ */
