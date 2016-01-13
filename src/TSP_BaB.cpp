@@ -110,13 +110,11 @@ void test_wydajnosci() {
 }
 
 void test_wydajnosci_ad() {
-	const int sizes_d = 14;
-	int size_d[sizes_d] =
-			{ 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30 };
+
 	int repeats = 100;
 	unsigned begin, end;
 
-	unsigned bb;
+	unsigned dyn, com;
 	SalesMan seller;
 
 	fstream out;
@@ -124,21 +122,28 @@ void test_wydajnosci_ad() {
 
 	Solution s;
 
-	cout << "\nSTART dynamiczny\n";
-	for (int i = 0; i < sizes_d; i++) {
-		cout << size_d[i] << "......" << endl;
-		bb = 0;
-		out << size_d[i] << ";";
+	for (int i = 4; i < 13; i++) {
+		cout << i << "......" << endl;
+		dyn = com = 0;
+		out << i << ";";
 		for (int j = 0; j < repeats; j++) {
 			cout << j << "\n";
-			seller.generate(size_d[i]);
+			seller.generate(i);
 			begin = clock();
-			seller.branchAndBound();
+			seller.complete();
 			end = clock();
-			bb += (end - begin);
+			com += (end - begin);
+
+			begin = clock();
+			seller.dynamic();
+			end = clock();
+			dyn += (end - begin);
 
 		}
-		out << (double) bb / (double) repeats / (double) CLOCKS_PER_SEC << endl;
+		out << (double) com / (double) repeats / (double) CLOCKS_PER_SEC << ";"<< (double) dyn / (double) repeats / (double) CLOCKS_PER_SEC<< endl;
+
+
+
 		cout << " done\n";
 	}
 	out.close();
@@ -338,6 +343,7 @@ int main() {
 	srand(time(0));
 
 	menu();
+//	test_wydajnosci_ad();
 
 	return 0;
 }

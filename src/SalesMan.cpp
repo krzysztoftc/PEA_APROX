@@ -258,7 +258,8 @@ pair<int, int> SalesMan::tsp_divide(int c, set<int> &ts,
 			int lc = *it;
 			int distance = matrix.getCost(lc, c);
 			set<int> ts2;
-			ts2.insert(ts.begin(), ts.end());
+
+			ts2 = ts;
 
 			ts2.erase(lc);
 
@@ -296,7 +297,6 @@ vector<int> SalesMan::rtsp() {
 	int c = 0;
 
 	set<int> cs;
-
 	for (int i = 1; i < matrix.size; i++) {
 		cs.insert(i);
 	}
