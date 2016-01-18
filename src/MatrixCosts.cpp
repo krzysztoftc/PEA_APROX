@@ -18,6 +18,7 @@
 #include <math.h>
 #include "Heap.h"
 #include "Edge.h"
+#include <stack>
 
 using namespace std;
 
@@ -34,7 +35,10 @@ void MatrixCosts::create() {
 	if (size == 0)
 		return;
 
+//	cout<<"Size: "<<size<<endl;
+
 	remove();
+//	cout<<"Size: "<<size<<endl;
 
 	matrix = new int*[size]();
 
@@ -441,13 +445,23 @@ std::vector<std::pair<int, int> > MatrixCosts::findLasts() {
 	return toRet;
 }
 
-list <pair<int, int> > MatrixCosts::mst_kruskal() const {
+MatrixCosts MatrixCosts::mst_kruskal() const {
+	MatrixCosts mst;
+	mst.size = this->size;
+	mst.create();
+
+	for (int i = 0; i < size; i++) {
+		for (int j = 0; j < size; j++) {
+			mst.matrix[i][j] = -1;
+		}
+	}
+
 	list<pair<int, int> > tree;
 	Heap queue;
 
 	for (unsigned int i = 0; i < size; i++) {
-		for (unsigned int j = i; j < size; j++) {
-			if (matrix[i][j] != 0) {
+		for (unsigned int j = i; j < size; j++) {		//TODO tu byla zmiana
+			if (matrix[i][j] != -1) {					//brak krawedzi
 				queue.add(Edge(i, matrix[i][j], j));
 			}
 		}
@@ -496,7 +510,9 @@ list <pair<int, int> > MatrixCosts::mst_kruskal() const {
 			}
 		}
 
-		tree.push_back(pair<int, int>(begin, end));
+		//tree.push_back(pair<int, int>(begin, end));
+		mst.matrix[begin][end] = matrix[begin][end];
+		mst.matrix[end][begin] = matrix[end][begin];
 
 		i++;
 
@@ -509,7 +525,48 @@ list <pair<int, int> > MatrixCosts::mst_kruskal() const {
 	delete[] sets;
 	delete[] tempSet;
 
-	return tree;
+	return mst;
 }
 
+vector<int> MatrixCosts::avaliableVerts(int vert) {
+	vector<int> v;
 
+	for (int i = 0; i < size; i++)
+		if (matrix[vert][i] > 0)
+			v.push_back(i);
+
+	return v;
+}
+
+vector<int> MatrixCosts::oddVerts() {
+	vector<int> v;
+
+	for (int i = 0; i < size; i++) {
+		if (avaliableVerts(i).size() % 2 != 0)
+			v.push_back(i);
+	}
+
+	return v;
+}
+
+vector<int> MatrixCosts::eulerCirc() {
+	vector<int> eulerianCircuit;
+	int currentVertex = 0;
+	stack<int> vertexStack;
+	vector <int> listVerts = avaliableVerts(currentVertex);
+	while (!vertexStack.empty() || listVerts.size()) {
+		if (!listVerts.size()) {
+			eulerianCircuit.push_back(currentVertex);
+			currentVertex = vertexStack.top();
+			vertexStack.pop();
+		} else {
+			vertexStack.push(currentVertex);
+			vector<int> vertexAdjacencyList = avaliableVerts(currentVertex);
+			matrix[currentVertex][vertexAdjacencyList.back()]=-1;
+			currentVertex = vertexAdjacencyList.back();
+
+		}
+		listVerts  = avaliableVerts(currentVertex);
+	}
+	return eulerianCircuit;
+}

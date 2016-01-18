@@ -140,9 +140,9 @@ void test_wydajnosci_ad() {
 			dyn += (end - begin);
 
 		}
-		out << (double) com / (double) repeats / (double) CLOCKS_PER_SEC << ";"<< (double) dyn / (double) repeats / (double) CLOCKS_PER_SEC<< endl;
-
-
+		out << (double) com / (double) repeats / (double) CLOCKS_PER_SEC << ";"
+				<< (double) dyn / (double) repeats / (double) CLOCKS_PER_SEC
+				<< endl;
 
 		cout << " done\n";
 	}
@@ -344,22 +344,26 @@ int main() {
 
 //	menu();
 //	test_wydajnosci_ad();
+int i = 0;
+float wsp;
+	do{
+	SalesMan s;
+	s.generate_euklidian(8);
 
-	MatrixCosts c;
-	//c.generate_euclidean(10);
-    c.readFile("dane.in");
-	cout<<c.toString();
+	Solution s1, s2;
 
-	list<pair <int, int> > tree = c.mst_prim();
+	s1 = s.complete();
+	s2 = s.aprox();
 
-	list<pair <int, int> >::iterator it = tree.begin();
-    int wage = 0;
-	while(tree.end()!=it){
-		cout<<"\n("<<it->first<<","<<it->second<<")";
-		wage+=c.getCost(*it);
-		it++;
-	}
+	cout << "\nDynamic: \n";
+	show_solution(s1);
 
-	cout<<"\nWage: "<<wage<<endl;
+	cout << "\nAprox:\n";
+	show_solution(s2);
+
+	wsp = (float)s2.cost/(float)s1.cost;
+	cout<<"\n\nWsp: "<<wsp<<"\n------------------------------------Poprawnych:"<<i++<<"\n\n\n";
+
+	}while(wsp <= 2 && wsp >= 1);
 	return 0;
 }

@@ -6,14 +6,6 @@
  */
 
 #include "SalesMan.h"
-#include <algorithm>
-#include <list>
-#include <climits>
-#include <queue>
-#include <vector>
-#include <exception>
-#include "SolutionNode.h"
-#include "Solutions.h"
 
 using namespace std;
 
@@ -36,6 +28,10 @@ string SalesMan::toString() {
 
 void SalesMan::generate(int cities) {
 	matrix.generate(cities);
+}
+
+void SalesMan::generate_euklidian(int cities) {
+	matrix.generate_euclidean(cities);
 }
 
 Solution SalesMan::complete() {
@@ -330,3 +326,38 @@ Solution SalesMan::dynamic() {
 
 	return toRet;
 }
+
+Solution SalesMan::aprox(){
+	Solution s;
+
+	MatrixCosts mst = matrix.mst_kruskal();
+
+	vector <int> euler = mst.eulerCirc();
+
+	s.cost = 0;
+	bool *visited = new bool[mst.size]();
+
+	vector<int>::iterator it = euler.begin()++;
+	s.trace.push_back(0);
+	visited[0]=true;
+	list<int>::iterator it_l = s.trace.begin();
+
+	while (euler.end() != it){
+		if(!visited[*it]){
+		s.cost += matrix.getCost(*it_l,*it);
+
+		s.trace.push_back(*it);
+		it_l++;
+
+		visited[*it] = true;
+		}
+		it++;
+	}
+
+	s.cost+=matrix.getCost(s.trace.back(), 0);
+	s.trace.push_back(0);
+
+	return s;
+}
+
+

@@ -11,7 +11,12 @@
 #include "MatrixCosts.h"
 #include "Solution.h"
 #include <vector>
-
+#include <algorithm>
+#include <list>
+#include <climits>
+#include <queue>
+#include <vector>
+#include "SolutionNode.h"
 #include "Solutions.h"
 
 class SalesMan {
@@ -22,8 +27,10 @@ public:
 	void readFile(std::string filename);
 	std::string toString();
 	void generate(int cities);
+	void generate_euklidian(int cities);
 	Solution branchAndBound();
 	Solution complete();
+	Solution aprox();
 
 	//just for dynamic algo
 	std::vector<int> rtsp();
