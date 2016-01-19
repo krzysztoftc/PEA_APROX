@@ -149,6 +149,65 @@ void test_wydajnosci_ad() {
 	out.close();
 }
 
+void test_wydajnosci_aprox() {
+	cout << "Wydajnosc" << endl;
+	int repeats = 100;
+	unsigned begin, end;
+
+	unsigned aprox, com;
+	SalesMan seller;
+
+	fstream out;
+	out.open("output.txt", ios::out);
+
+	Solution s;
+
+	for (int i = 4; i < 12; i++) {
+		cout << i << "......" << endl;
+		aprox = com = 0;
+		out << i << ";";
+		for (int j = 0; j < repeats; j++) {
+			cout << j << "\n";
+			seller.generate_euklidian(i);
+			begin = clock();
+			seller.complete();
+			end = clock();
+			com += (end - begin);
+
+			begin = clock();
+			seller.aprox();
+			end = clock();
+			aprox += (end - begin);
+
+		}
+		out << (double) com / (double) repeats / (double) CLOCKS_PER_SEC << ";"
+				<< (double) aprox / (double) repeats / (double) CLOCKS_PER_SEC
+				<< endl;
+
+		cout << " done\n";
+	}
+	out.close();
+}
+
+void testy_jakosciowe() {
+
+	fstream out;
+	out.open("jakosc.txt", ios::out);
+
+	unsigned aprox, com;
+	SalesMan seller;
+	out << "dynamic" << ";" << "aprox" << endl;
+	cout << "jakosciowe\n";
+	for (int i = 4; i < 20; i++) {
+		cout << i << "..." << endl;
+		seller.generate_euklidian(i);
+		out << seller.branchAndBound().cost << ";" << seller.aprox().cost
+				<< endl;
+	}
+
+	out.close();
+}
+
 void show_solution(Solution &s) {
 	list<int>::iterator it = s.trace.begin();
 	cout << endl << *it++;
@@ -166,7 +225,7 @@ void menu() {
 	while (1) {
 		printf("\033c");
 		cout << "==========================================================\n"
-				<< "=   PROJEKTOWANIE EFEKTYWNYCH ALGORYTMOW LABORATORIUM 2  =\n"
+				<< "=   PROJEKTOWANIE EFEKTYWNYCH ALGORYTMOW LABORATORIUM 3  =\n"
 				<< "=   Kinga Wilczek        210063                          =\n"
 				<< "=   Krzysztof Cabala     210047                          =\n"
 				<< "==========================================================\n\n";
@@ -175,7 +234,8 @@ void menu() {
 			cout << "MENU:\n" << "1. Wyswietl graf\n" << "2. Generuj graf\n"
 					<< "3. Wczytaj plik\n" << "4. Przeglad zupelny\n"
 					<< "5. Branch & Bound\n" << "6. Algorytm dynamiczny\n"
-					<< "7. Koniec\n" << ">";
+					<< "7. Generuj graf metryczny\n"
+					<< "8. Schemat aproksymacyjny\n" << "9. Koniec\n" << ">";
 
 			system("stty raw isig");
 			wybor = getchar();
@@ -296,16 +356,66 @@ void menu() {
 		}
 
 		case '7': {
+
+			cout << "\nPodaj ilosc wierzcholkow: \n";
+			int n;
+			cin >> n;
+
+			seller.generate_euklidian(n);
+
+			wybor = 0;
+
+			break;
+		}
+
+		case '8': {
+			unsigned begin, end;
+			Solution s, sb;
+			SalesMan tmp = seller;
+
+			begin = clock();
+			s = tmp.aprox();
+			end = clock();
+
+			cout << (double) (end - begin) / CLOCKS_PER_SEC * 1000;
+
+			cout << " ms\nRozwiazanie:\n";
+			show_solution(s);
+
+			cout << "\nPorownanie z B&B:\nCzas dzialania: \n";
+
+			begin = clock();
+			sb = tmp.branchAndBound();
+			end = clock();
+
+			cout << (double) (end - begin) / CLOCKS_PER_SEC * 1000;
+
+			cout << " ms\nRozwiazanie:\n";
+			show_solution(sb);
+
+			cout<< "\nStosunek: "<<(float)(s.cost)/(float)sb.cost;
+
+			cout << "\n\nWcisnij dowolny przycisk...";
+
+			system("stty raw isig");
+			getchar();
+			system("stty cooked");
+			wybor = '0';
+
+			break;
+		}
+
+		case '9':{
 			return;
 		}
 
-		case '9': {
+		case 'a': {
 			seller.readFile("tsp10.txt");
 			wybor = '0';
 			break;
 		}
 
-		case '8': {
+		case 'b': {
 			seller.readFile("tsp4.txt");
 			wybor = '0';
 			break;
@@ -339,31 +449,36 @@ void test_poprawnosci_dynamic() {
 	} while (s.cost == s2.cost);
 }
 
+void test_poprawnosci_aprox() {
+	int i = 0;
+	float wsp;
+	do {
+		SalesMan s;
+		s.generate_euklidian(8);
+
+		Solution s1, s2;
+
+		s1 = s.complete();
+		s2 = s.aprox();
+
+		cout << "\nDynamic: \n";
+		show_solution(s1);
+
+		cout << "\nAprox:\n";
+		show_solution(s2);
+
+		wsp = (float) s2.cost / (float) s1.cost;
+		cout << "\n\nWsp: " << wsp
+				<< "\n------------------------------------Poprawnych:" << i++
+				<< "\n\n\n";
+
+	} while (wsp <= 2 && wsp >= 1);
+}
+
 int main() {
 	srand(time(0));
 
-//	menu();
-//	test_wydajnosci_ad();
-int i = 0;
-float wsp;
-	do{
-	SalesMan s;
-	s.generate_euklidian(8);
+	menu();
 
-	Solution s1, s2;
-
-	s1 = s.complete();
-	s2 = s.aprox();
-
-	cout << "\nDynamic: \n";
-	show_solution(s1);
-
-	cout << "\nAprox:\n";
-	show_solution(s2);
-
-	wsp = (float)s2.cost/(float)s1.cost;
-	cout<<"\n\nWsp: "<<wsp<<"\n------------------------------------Poprawnych:"<<i++<<"\n\n\n";
-
-	}while(wsp <= 2 && wsp >= 1);
 	return 0;
 }
